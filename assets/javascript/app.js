@@ -1,169 +1,157 @@
-$(document).ready(function() {
-// variables 
-var trivia = [
-    {
-		question: "What is the name of Jan's candle company ?", 
-		options: ["Serenity by Jan", "Burn It", "Light by Jan", "Keep it Bright"],
-		answer: 0,
-		photo: "assets/images/candles.jpg"
-	 },
-	 {
-	 	question: "What is Pete's nickname ?", 
-		options: ["Slim", "Plop", "Slayer", "Dwight Jr."],
-		answer: 1,
-		photo: "assets/images/plop.jpg"
-	 }, 
-	 {
-	 	question: "Andy adds what to his drink at Gabe's party?", 
-		options: ["Cocaine", "Turtle", "Lava", "Sea Horse" ],
-		answer: 3,
-		photo: "assets/images/seahorse.jpg"
-	}, 
-	{
-		question: "Toby's brothers name is?", 
-		options: ["Rory", "Brian", "Sam", "Chad" ],
-		answer: 0,
-		photo: "assets/images/rory.jpg"
-	}, 
-	{
-		question: "What is the name of Oscar's trivia team?", 
-		options: ["Queerstien Bears", "Asops Foibles", "The Quizzards", "Les Quizeriables" ],
-		answer: 1,
-		photo: "assets/images/oscar.jpg"
-	}, 
-	{
-		question: "How many seasons of The Office are there?", 
-		options: ["19", "6", "10", "9" ],
-		answer: 3,
-		photo: "assets/images/herring.jpg"
-	}, 
-	{
-		question: "Which office employee did Micahel hit with his car?", 
-		options: ["Angela", "Kevin", "Meredith", "Stanley" ],
-		answer: 2,
-		photo: "assets/images/meredith.gif"
-	}
-];
+$(document).ready(function () {
+    var correctA = 0;
+    var wrongA = 0;
+    var unansweredQ = 0;
+    var timeRemaining = 15;
+    var intervalID;
+    var indexQandA = 0;
+    var answered = false;
+    var correct;
+    var triviaGame = [
+        {
+            question: "What is the name of Jan's candle company ?",
+            answer: ["Serenity by Jan", "Burn It", "Light by Jan", "Keep it Bright"],
+            correct: "0",
+            image: "assets/images/candles.jpg"
+        },
+        {
+            question: "What is Pete's nickname ?",
+            answer: ["Slim", "Plop", "Slayer", "Dwight Jr."],
+            correct: "1",
+            image: "assets/images/plop.jpg"
+        },
+        {
+            question: "Andy adds what to his drink at Gabe's party?",
+            answer: ["Cocaine", "Turtle", "Lava", "Sea Horse"],
+            correct: "3",
+            image: "assets/images/seahorse.jpg"
+        },
+        {
+            question: "Toby's brothers name is?",
+            answer: ["Rory", "Brian", "Sam", "Chad"],
+            correct: "0",
+            image: "assets/images/rory.jpg"
+        },
+        {
+            question: "What is the name of Oscar's trivia team?",
+            answer: ["Queerstien Bears", "Asops Foibles", "The Quizzards", "Les Quizeriables"],
+            correct: "1",
+            image: "assets/images/oscar.jpg"
+        },
+        {
+            question: "How many seasons of The Office are there?",
+            answer: ["19", "6", "10", "9"],
+            correct: "3",
+            image: "assets/images/seasons.jpg"
+        },
+        {
+            question: "Which office employee did Micahel hit with his car?",
+            answer: ["Angela", "Kevin", "Meredith", "Stanley"],
+            correct: "2",
+            image: "assets/images/meredith.jpeg"
+        }
+    ];
 
-var correctA = 0;
-var wrongA = 0;
-var unansweredQ = 0;
-var timer = 15;
-var intervalID;
-var userGuesses = "";
-var running = false;
-var Q = trivia.length;
-var choose;
-var index;
-var newArray = [];
-var holder = [];
 
-$("#startover").hide();
-//click start button to start game
-$("#start").on("click", function () {
-		$("#start").hide();
-		showTrivia();
-		startTimer();
-		for(var i = 0; i < trivia.length; i++) {
-	holder.push(trivia[i]);
-}
-    })
-//timer start
-function startTimer(){
-	if (!running) {
-	intervalId = setInterval(countdown, 1000); 
-	running = true;
+    $("#startover").hide();
+    function startGame() {
+        $("#start").remove();
+        correctA = 0;
+        wrongA = 0;
+        unansweredQ = 0;
+        loadQandA();
     }
-}
-//timer countdown
-function countdown() {
-	$("#timer").html("Time remaining: " + timer);
-	timer --;
-//stop timer if reach 0
-	if (timer === 0) {
-		unansweredQ++;
-		stop();
-		$("#options").html("<p>Time is up! The correct answer is: " + choose.options[choose.answer] + "</p>");
-		picture();
-	}	
-}
-//timer stop
-function stop() {
-	running = false;
-	clearInterval(intervalId);
-}
 
+    function loadQandA() {
+        answered = false;
+        timeRemaining = 15;
+        intervalID = setInterval(timer, 1000);
+        if (answered === false) {
+            timer();
+        }
+        correct = triviaGame[indexQandA].correct;
+        var question = triviaGame[indexQandA].question;
+        $("#questions").html(question);
+        for (var i = 0; i < 4; i++) {
+            var answer = triviaGame[indexQandA].answer[i];
+            $("#answers").append('<h4 class= answersAll id=' + i + '>' + answer + '</h4>');
+        }
 
-    function showTrivia() {
-        //generate random index in array
-        index = Math.floor(Math.random()*trivia.length);
-        choose = trivia[index];
-$("#questions").html(choose.question)
-    for(var i = 0; i < choose.options.length; i++) {
-        var userChoice = $("<div>");
-        userChoice.addClass("answerchoice");
-        userChoice.html(choose.options[i]);
-        //assign array position to it so can check answer
-        userChoice.attr("data-guessvalue", i);
-        $("#questions").append(userChoice);    
-}
+        $("h4").click(function () {
+            var id = $(this).attr('id');
+            if (id === correct) {
+                answered = true;
+                $("#questions").text("Answer: " + triviaGame[indexQandA].answer[correct]);
+                correctAnswer();
+            } else {
+                answered = true;
+                $("#questions").text("You picked: " + triviaGame[indexQandA].answer[id] + "..but the answer is: " + triviaGame[indexQandA].answer[correct]);
+                incorrectAnswer();
+            }
+        });
     }
-$(".answerchoice").on("click", function () {
-	//grab array position from userGuess
-	userGuesses = parseInt($(this).attr("data-guessvalue"));
 
-	//correct guess or wrong guess outcomes
-	if (userGuesses === choose.answer) {
-		stop();
-		correctA++;
-		userGuesses="";
-		$("#answers").html("<p>Correct!</p>");
-		picture();
+    function timer() {
+        if (timeRemaining === 0) {
+            answered = true;
+            clearInterval(intervalID);
+            $("#questions").text("The Correct Answer: " + triviaGame[indexQandA].answer[correct]);
+            unAnswered();
+        } else if (answered === true) {
+            clearInterval(intervalID);
+        } else {
+            timeRemaining--;
+            $("#timer").text("Time Remaing" + " " + timeRemaining);
+        }
+    }
 
-	} else {
-		stop();
-		wrongA++;
-		userGuesses="";
-		$("#answers").html("<p>Wrong! The correct answer is: " + choose.options[choose.answer] + "</p>");
-		picture();
-	}
-})
-function picture () {
-	$("#answers").append("<img src=" + choose.photo + ">");
-	newArray.push(choose);
-	options.splice(index,1);
+    function correctAnswer() {
+        correctA++;
+        $("#timer").text("Your're Correct!!!")
+        resetRound();
+    }
 
-	var hidpic = setTimeout(function() {
-		$("#answers").empty();
-		timer= 20;
+    function incorrectAnswer() {
+        wrongA++;
+        $("#timer").text("Wrong Answer...Bummer!")
+        resetRound();
 
-	//run the score screen if all questions answered
-	if ((wrongA + correctA + unansweredQ) === Q) {
-		$("#questions").empty();
-		$("#questions").html("<h3>Game Over!  Here's how you did: </h3>");
-		$("#answers").append("<h4> Correct: " + correctCount + "</h4>" );
-		$("#answers").append("<h4> Incorrect: " + wrongCount + "</h4>" );
-		$("#answers").append("<h4> Unanswered: " + unanswerCount + "</h4>" );
-		$("#reset").show();
-		correctCount = 0;
-		wrongCount = 0;
-		unanswerCount = 0;
+    }
 
-	} else {
-		startTimer();
-		showTrivia();
-	}
-}, 3000);
-}
-$("#startover").on("click", function() {
-	$("#startover").hide();
-	$("#answers").empty();
-	$("#questions").empty();
-	for(var i = 0; i < holder.length; i++) {
-		options.push(holder[i]);
-	}
-	startTimer();
-	startTrivia();
+    function unAnswered() {
+        unansweredQ++;
+        $("#timer").text("You Havn't Picked An Answer")
+        resetRound();
+    }
 
-})
+    function resetRound() {
+        $('.answersAll').remove();
+        $("#answers").append('<img class=answerImage  src="' + triviaGame[indexQandA].image + ' ">');
+        indexQandA++;
+        if (indexQandA < triviaGame.length) {
+            setTimeout(function () {
+                loadQandA();
+                $('.answerImage').remove();
+            }, 4000);
+        } else {
+            setTimeout(function () {
+                $("#questions").remove();
+                $("#timer").remove();
+                $('.answerImage').remove();
+                $("#answers").append('<h4 class= answersAll end>CORRECT ANSWERS: ' + correctA + '</h4>');
+                $("#answers").append('<h4 class= answersAll end>INCORRECT ANSWERS: ' + wrongA + '</h4>');
+                $("#answers").append('<h4 class= answersAll end>UNANSWERED QUESTIONS: ' + unansweredQ + '</h4>');
+                setTimeout(function () {
+                    location.reload();
+                }, 5000);
+            }, 4000);
+        }
+    };
+
+    $("#start").on("click", function () {
+        $("#start");
+        startGame();
+
+    });
+
 });
