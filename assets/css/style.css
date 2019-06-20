@@ -1,0 +1,22 @@
+.navbar-brand{
+    font-family: 'Knewave', cursive;
+    color: white;
+}
+#background{
+    height: 100%;
+    width: 100%;
+    position: fixed;
+}
+h1{
+    font-family: 'Knewave', cursive;
+    font-size: 50px;
+    text-align: center;
+    margin-top: 65px;
+    color: black;
+}
+#questionbox{
+    height:600px;
+    width: 250px;
+    background-color: #f0f8ff8a;
+    margin-top: 10px;
+}
